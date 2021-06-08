@@ -9,17 +9,20 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
-from .models import *
 from .forms import CreateUserForm
+from .models import *
+
+
 # from .filters import OrderFilter
 
 
 
 def index(request):
-    context ={
-
-    }
-    return render(request, 'recommendation/index.html')
+	movies = Movie.objects.all()
+	context = {
+		'movies' : movies
+	}
+	return render(request, 'recommendation/index.html', context)
 
 
 def signup(request):
@@ -27,6 +30,7 @@ def signup(request):
 		return redirect('index')
 	else:
 		form = CreateUserForm()
+		title = 'signup'
 		if request.method == 'POST':
 			form = CreateUserForm(request.POST)
 			if form.is_valid():
@@ -35,8 +39,10 @@ def signup(request):
 				messages.success(request, 'Account created sucessfully ' + user)
 				return redirect('signin')
 			
-
-		context = {'form':form}
+		context = {
+			'form':form,
+			'title': title	
+		}
 		return render(request, 'recommendation/signup.html', context)
 
 def signin(request):

@@ -23,9 +23,10 @@
 </head>
 
 <body>
+    {% block header %}
     <div class="container ">
-        {% block header %}
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light p-0">
             <div class="container-fluid ">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -36,7 +37,8 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
                         <li class="nav-item">
-                            <a class="navbar-brand" href="{% url 'index' %}"><img style="width: 100px;"src="{% static 'recommendation/images/symdev_logo.jpeg'%}" alt=""></a>
+                            <a class="navbar-brand" href="{% url 'index' %}"><img style="width: 100px;"
+                                    src="{% static 'recommendation/images/symdev_logo.jpeg'%}" alt=""></a>
                         </li>
 
                     </ul>
@@ -51,7 +53,7 @@
                     </form>
                 </div>
 
-                
+
 
                 <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
 
@@ -70,8 +72,8 @@
                             <a class="nav-link" href="#">Hello, {{user}}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url 'signout' %}"><button type="button"
-                                    class="btn btn-outline-danger btn-sm">SIGN OUT</button></a>
+                            <a class="nav-link active" aria-current="page" href="{% url 'signout' %}"><button
+                                    type="button" class="btn btn-outline-danger btn-sm">SIGN OUT</button></a>
                         </li>
                         {% endif %}
                     </ul>
@@ -80,24 +82,22 @@
             </div>
         </nav>
 
-
-
-        {% endblock header %}
     </div>
 
-    <div class="container">
-        {% block main %}
 
-        {% endblock main %}
-    </div>
+    {% endblock header %}
 
+    {% block main %}
+
+    {% endblock main %}
+
+    {% block footer %}
     <div class="container text-center">
-        {% block footer %}
         <footer class="footer">
             <span class="text">&copy; 2021 SYMDev</span>
         </footer>
-        {% endblock footer %}
     </div>
+    {% endblock footer %}
 
 </body>
 
