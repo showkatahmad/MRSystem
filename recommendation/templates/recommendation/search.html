@@ -1,12 +1,9 @@
 {% extends 'recommendation/base.html'%}
 {% block main %}
 <div class="container text-center">
+    <h2>Searches</h2>
     <div class="row">
         {% for movie in movies %}
-        
-        
-      
-       
         <div class="col-sm-3 my-1">
             <div class="card">
                 <img src="{{movie.poster.url}}" alt="poster" class="card-img-top " style="height: 150px;">
@@ -16,11 +13,7 @@
                     <a href="#" class="btn btn-primary">Go somewhere</a>
                 </div>
             </div>
-        </div>
-        
-       
-       
-       
+        </div>   
         {% endfor %}
     </div>
 </div>

@@ -4,5 +4,7 @@ urlpatterns = [
     path('',  index, name='index'),
 	path('signup/', signup, name="signup"),
 	path('signin/', signin, name="signin"),  
-	path('signout/', signout, name="signout"),
+	path('signout/', signout, name="signout")
+	
+	# path('search', search, name="search"),
 ]

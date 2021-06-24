@@ -1,12 +1,14 @@
-from django.shortcuts import render, redirect 
+from django.shortcuts import render, redirect , HttpResponse
 from django.forms import inlineformset_factory
 from django.contrib.auth.forms import UserCreationForm
 
+from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
+from recommendation.models import Movie
 
 # Create your views here.
 from .forms import CreateUserForm
@@ -18,12 +20,18 @@ from .models import *
 
 
 def index(request):
-	movies = Movie.objects.all()
-	context = {
-		'movies' : movies
-	}
-	return render(request, 'recommendation/index.html', context)
-
+    movies = Movie.objects.all()
+    query = request.GET.get('q')
+    context = {
+        'movies':movies
+    }
+    if query:
+        movies = Movie.objects.filter(Q(title__icontains=query)).distinct()
+        context = {
+            'movies':movies
+        }
+        return render(request, 'recommendation/index.html', context)
+    return render(request, 'recommendation/index.html', context)
 
 def signup(request):
 	if request.user.is_authenticated:
@@ -67,6 +75,14 @@ def signin(request):
 def signout(request):
 	logout(request)
 	return redirect('signin')
+
+# def search(request):
+# 	query =request.GET['query']
+# 	movies = Movie.objects.filter(title__icontains = query)
+# 	params= {'movies':movies }
+# 	return render(request, 'recommendation/search.html', params )
+	# return HttpResponse("this is search!!")
+
 
 
 # @login_required(login_url='login')
