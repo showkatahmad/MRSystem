@@ -1,149 +1,161 @@
-from django.shortcuts import render, redirect 
-from django.forms import inlineformset_factory
-from django.contrib.auth.forms import UserCreationForm
-
-from django.contrib.auth import authenticate, login, logout
-
-from django.contrib import messages
-
+from django.shortcuts import render,get_object_or_404,redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
+from django.http.response import HttpResponse
+from django.shortcuts import redirect, render
+from django.db.models import Case, When
+from django.contrib.auth import logout
+from .recommendation import Recommend
+from .forms import RegisterUserForm
+from django.contrib import messages
+from django.db.models import Q
+from .models import *
+import pandas as pd
+import numpy as np 
+
 
 # Create your views here.
-from .forms import CreateUserForm
-from .models import *
-
-
-# from .filters import OrderFilter
-
-
-
 def index(request):
-	movies = Movie.objects.all()
-	context = {
-		'movies' : movies
-	}
-	return render(request, 'recommendation/index.html', context)
+    if request.user.is_authenticated:
+        return redirect('recommendation:recommended_movies')
+    movies = Movie.objects.all()
+    query = request.GET.get('q')
+    context = {
+        'movies':movies
+    }
+    if query:
+        movies = Movie.objects.filter(Q(title__icontains=query)).distinct()
+        context = {
+            'movies':movies
+        }
+        return render(request, 'recommendation/index.html', context)
+    return render(request, 'recommendation/index.html', context)
+
+# def log_in(request):
+#     if request.user.is_authenticated:
+# 		return redirect('recommendation:recommended_movies')
+# 	else:
+#         if request.method == 'POST':
+#             username = request.POST['username']
+#             password = request.POST['password']
+#             user = authenticate(request, username=username, password=password)
+#             if user:
+#                 login(request, user)
+#                 return redirect("recommendation:recommended_movies")       
+#             else:
+#                 return render(request, 'recommendation/log_in.html', {'error_message': 'Account Disabled', 'title':'login | MRSystem'})
+#         return render(request, 'recommendation/log_in.html', {'title':'login | MRSystem'})
 
 
-def signup(request):
+def log_in(request):
 	if request.user.is_authenticated:
-		return redirect('index')
-	else:
-		form = CreateUserForm()
-		title = 'signup'
-		if request.method == 'POST':
-			form = CreateUserForm(request.POST)
-			if form.is_valid():
-				form.save()
-				user = form.cleaned_data.get('username')
-				messages.success(request, 'Account created sucessfully ' + user)
-				return redirect('signin')
-			
-		context = {
-			'form':form,
-			'title': title	
-		}
-		return render(request, 'recommendation/signup.html', context)
-
-def signin(request):
-	if request.user.is_authenticated:
-		return redirect('index')
+		return redirect('recommendation:recommended_movies')
 	else:
 		if request.method == 'POST':
 			username = request.POST.get('username')
 			password =request.POST.get('password')
-
 			user = authenticate(request, username=username, password=password)
-
 			if user is not None:
 				login(request, user)
-				return redirect('index')
+				return redirect('recommendation:recommended_movies')
 			else:
 				messages.info(request, 'invalid credentials')
-
 		context = {}
-		return render(request, 'recommendation/signin.html', context)
+		return render(request, 'recommendation/log_in.html', context)
 
-def signout(request):
-	logout(request)
-	return redirect('signin')
+# def sign_up(request):
+#     form = RegisterUserForm()
+#     context = {
+#         'form' : form
+#     }
+#     if request.method == 'POST':
+#         form = RegisterUserForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect("recommendation:log_in")
+#     return render(request, 'recommendation/sign_up.html', context)
 
 
-# @login_required(login_url='login')
-# def home(request):
-# 	orders = Order.objects.all()
-# 	customers = Customer.objects.all()
 
-# 	total_customers = customers.count()
 
-# 	total_orders = orders.count()
-# 	delivered = orders.filter(status='Delivered').count()
-# 	pending = orders.filter(status='Pending').count()
+def sign_up(request):
+	if request.user.is_authenticated:
+		return redirect('recommendation:recommended_movies')
+	else:
+		form = RegisterUserForm()
+		title = 'Sign Up | MRSystem'
+		if request.method == 'POST':
+			form = RegisterUserForm(request.POST)
+			if form.is_valid():
+				form.save()
+				user = form.cleaned_data.get('username')
+				messages.success(request, 'Account created sucessfully ' + user)
+				return redirect('recommendation:log_in')			
+		context = {
+			'form':form,
+			'title': title	
+		}
+		return render(request, 'recommendation/sign_up.html', context)
 
-# 	context = {'orders':orders, 'customers':customers,
-# 	'total_orders':total_orders,'delivered':delivered,
-# 	'pending':pending }
+def log_out(request):
+    logout(request)
+    return redirect('recommendation:log_in')
 
-# 	return render(request, 'accounts/dashboard.html', context)
+# Redirect to a success page.
+@login_required(login_url='recommendation:log_in')
+def recommended_movies(request):
+    context = {
 
-# @login_required(login_url='login')
-# def products(request):
-# 	products = Product.objects.all()
+    }
+    return render(request, 'recommendation/recommended_movies.html', context)
 
-# 	return render(request, 'accounts/products.html', {'products':products})
+# @login_required(login_url='recommendation:log_in')
+# def detail(request, movie_id):
+#     movie = get_object_or_404(Movie, id=movie_id)
+#     if request.method == "POST":
+#         rate = request.POST['rating']
+#         ratingObject = Rating()
+#         ratingObject.user   = request.user
+#         ratingObject.movie  = movie
+#         ratingObject.rating = rate
+#         ratingObject.save()
+#         messages.success(request,"Rating submited successfully!")
+#         return redirect("recommendation:recommended_movies")
+#     return render(request,'recommendation/detail.html', {'movie': movie})
 
-# @login_required(login_url='login')
-# def customer(request, pk_test):
-# 	customer = Customer.objects.get(id=pk_test)
 
-# 	orders = customer.order_set.all()
-# 	order_count = orders.count()
+@login_required(login_url='recommendation:log_in')
+def detail(request,movie_id):	
+	movies = get_object_or_404(Movie,id=movie_id)
+	#for rating
+	if request.method == "POST":
+		rate = request.POST['rating']
+		ratingObject = Rating()
+		ratingObject.user   = request.user
+		ratingObject.movie  = movies
+		ratingObject.rating = rate
+		ratingObject.save()
+		messages.success(request,"Rating submited Successfully!")
+		return redirect("recommendation:recommended_movies")
+	return render(request,'recommendation/detail.html',{'movies':movies})
 
-# 	myFilter = OrderFilter(request.GET, queryset=orders)
-# 	orders = myFilter.qs 
-
-# 	context = {'customer':customer, 'orders':orders, 'order_count':order_count,
-# 	'myFilter':myFilter}
-# 	return render(request, 'accounts/customer.html',context)
-
-# @login_required(login_url='login')
-# def createOrder(request, pk):
-# 	OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'), extra=10 )
-# 	customer = Customer.objects.get(id=pk)
-# 	formset = OrderFormSet(queryset=Order.objects.none(),instance=customer)
-# 	#form = OrderForm(initial={'customer':customer})
-# 	if request.method == 'POST':
-# 		#print('Printing POST:', request.POST)
-# 		form = OrderForm(request.POST)
-# 		formset = OrderFormSet(request.POST, instance=customer)
-# 		if formset.is_valid():
-# 			formset.save()
-# 			return redirect('/')
-
-# 	context = {'form':formset}
-# 	return render(request, 'accounts/order_form.html', context)
-
-# @login_required(login_url='login')
-# def updateOrder(request, pk):
-
-# 	order = Order.objects.get(id=pk)
-# 	form = OrderForm(instance=order)
-
-# 	if request.method == 'POST':
-# 		form = OrderForm(request.POST, instance=order)
-# 		if form.is_valid():
-# 			form.save()
-# 			return redirect('/')
-
-# 	context = {'form':form}
-# 	return render(request, 'accounts/order_form.html', context)
-
-# @login_required(login_url='login')
-# def deleteOrder(request, pk):
-# 	order = Order.objects.get(id=pk)
-# 	if request.method == "POST":
-# 		order.delete()
-# 		return redirect('/')
-
-# 	context = {'item':order}
-# 	return render(request, 'accounts/delete.html', context)
+@login_required(login_url='recommendation:log_in')
+def recommended_movies(request):	
+	df=pd.DataFrame(list(Rating.objects.all().values()))
+	nu=df.user_id.unique().shape[0]
+	current_user_id= request.user.id
+	# if new user not rated any movie
+	if current_user_id>nu:
+		movie=Movie.objects.get(id=15)
+		q=Rating(user=request.user,movie=movie,rating=0)
+		q.save()
+	print("Current user id: ",current_user_id)
+	prediction_matrix,Ymean = Recommend()
+	my_predictions = prediction_matrix[:,current_user_id-1]+Ymean.flatten()
+	pred_idxs_sorted = np.argsort(my_predictions)
+	pred_idxs_sorted[:] = pred_idxs_sorted[::-1]
+	pred_idxs_sorted=pred_idxs_sorted+1
+	print(pred_idxs_sorted)
+	preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(pred_idxs_sorted)])
+	movie_list=list(Movie.objects.filter(id__in = pred_idxs_sorted,).order_by(preserved)[:10])
+	return render(request,'recommendation/recommended_movies.html',{'movie_list':movie_list})
