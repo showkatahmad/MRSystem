@@ -76,6 +76,13 @@ def signout(request):
 	logout(request)
 	return redirect('signin')
 
+
+@login_required
+def profile(request):
+    return render(request, 'recommendation/profile.html')    
+
+
+
 # def search(request):
 # 	query =request.GET['query']
 # 	movies = Movie.objects.filter(title__icontains = query)

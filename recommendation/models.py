@@ -21,3 +21,11 @@ class Rating(models.Model):
 	user   	= models.ForeignKey(User, on_delete=models.CASCADE) 
 	movie 	= models.ForeignKey(Movie, on_delete=models.CASCADE)
 	rating 	= models.IntegerField(default=1, validators=[MaxValueValidator(5),MinValueValidator(0)])
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete= models.CASCADE)
+    image = models.ImageField(default='default.jpg', upload_to = 'profile_pics')
+
+    def __str__(self):
+        return f'{self.user.username} Profile'    
