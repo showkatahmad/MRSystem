@@ -10,7 +10,7 @@ class Genre(models.Model):
 
 
 class Movie(models.Model):
-    title = models.CharField(max_length=128, null=True)
+    title = models.CharField(max_length=64, null=True)
     poster = models.ImageField(upload_to='images/')
     genre = models.ManyToManyField(Genre)
     def __str__(self):
