@@ -10,8 +10,9 @@ urlpatterns = [
     path('login/', log_in, name='log_in'),
     path('logout/', log_out, name='log_out'),
     path('signup/', sign_up, name='sign_up'),
+    path('<int:movie_id>/', detail, name='detail'),
     path('recommendedmovies/', recommended_movies, name='recommended_movies'),
-    path('<int:movie_id>/', detail, name='detail')
+    path('newuser/', newuser, name='newuser'),
 ]
 
 if settings.DEBUG:

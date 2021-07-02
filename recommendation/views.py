@@ -123,6 +123,12 @@ def recommended_movies(request):
 #         return redirect("recommendation:recommended_movies")
 #     return render(request,'recommendation/detail.html', {'movie': movie})
 
+def newuser(request):
+	context = {
+		'movies':Movie.objects.all()[:16]
+	}
+	return render(request, 'recommendation/index.html', context)
+	
 
 @login_required(login_url='recommendation:log_in')
 def detail(request,movie_id):	
@@ -146,9 +152,10 @@ def recommended_movies(request):
 	current_user_id= request.user.id
 	# if new user not rated any movie
 	if current_user_id>nu:
-		movie=Movie.objects.get(id=15)
-		q=Rating(user=request.user,movie=movie,rating=0)
-		q.save()
+		#movie=Movie.objects.get(id=1)
+		#q=Rating(user=request.user,movie=movie,rating=5)
+		#q.save()
+		return redirect("recommendation:newuser")
 	print("Current user id: ",current_user_id)
 	prediction_matrix,Ymean = Recommend()
 	my_predictions = prediction_matrix[:,current_user_id-1]+Ymean.flatten()
