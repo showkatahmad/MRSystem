@@ -1,0 +1,156 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <title>{% block title %}MRSystem{% endblock title %}</title>
+
+  <style type="text/css">
+    .star-rating {
+      line-height: 32px;
+      font-size: 1.25em;
+    }
+
+    .star-rating .fa-star {
+      color: yellow;
+    }
+  </style>
+</head>
+
+<body>
+  {% block header %}
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'index' %}"><img style="height:32px;"
+        src="{% static 'web/images/symdev_logo.jpeg'%}" alt="SYMDev"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'index' %}"> MRSystem<span class="sr-only">(current)</span></a>
+        </li>
+      </ul>
+      <ul class="navbar-nav mr-auto">
+        <form class="form-inline my-2 my-lg-0" role="search" method="get" action=''>
+          <input type="text" class="form-control mr-sm-2 " name="q" value="{{ request.GET.q }}"
+            placeholder="Search Movies " />
+          <button class="btn btn-outline-primary rounded-circle my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </ul>
+      {% if request.user.is_authenticated %}
+      <button class="btn btn-success mx-2 rounded-circle">{{request.user | capfirst}}</button>
+      <a href="{% url 'logout' %}" class="btn btn-danger mx-2 rounded-circle">Log Out</a>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn btn-primary mx-2 rounded-circle">Log in</a>
+      <a href="{% url 'register' %}" class="btn btn-success mx-2 rounded-circle">Register</a>
+      {% endif %}
+    </div>
+  </nav>
+  {% block genre_button%}
+  <div class="container text-center col-lg-12 col-sm-12">
+    <hr class="m-0">
+    <a href="{% url 'recommend' %}" type="button"
+      class="btn rounded  px-3 btn-outline-primary m-1  btn-sm {{active_recommend}}">recommendations</a>
+    <a href="{% url 'index' %}" class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_all}}">all</a>
+    <a href="{% url 'action' %}"
+      class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_action}}">action</a>
+    <a href="{% url 'animation' %}"
+      class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_animation}}">animation</a>
+    <a href="{% url 'biography' %}"
+      class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_biography}}">biography</a>
+    <a href="{% url 'comedy'%}" class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_comedy}}">comedy</a>
+    <a href="{% url 'crime' %}" class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_crime}}">crime</a>
+    <a href="{% url 'drama' %}" class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_drama}}">drama</a>
+    <a href="{% url 'family' %}"
+      class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_family}}">family</a>
+    <a href="{% url 'fantasy' %}"
+      class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_fantasy}}">fantasy</a>
+    <a href="{% url 'horror' %}"
+      class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_horror}}">horror</a>
+    <a href="{% url 'mystery' %}"
+      class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_mystery}}">mystery</a>
+    <a href="{% url 'romance' %}"
+      class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_romance}}">romance</a>
+    <a href="{% url 'war' %}" class="btn rounded  px-3 btn-outline-secondary m-1  btn-sm {{active_war}}">war</a>
+    <hr class="m-0">
+  </div>
+  <div class="container">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success text-center" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+  </div>
+  {% endblock genre_button%}
+  {% endblock header %}
+  {% block main %}
+  {% endblock main %}
+  {% block footer %}
+  {% endblock footer %}
+
+
+  <!-- Optional JavaScript -->
+
+  <script type="text/javascript" src="{%static 'recommendation/js/jquery.min.js'%}">
+  </script>
+
+
+
+  <script type="text/javascript">
+    var $star_rating = $('.star-rating .fa');
+
+    var SetRatingStar = function () {
+      return $star_rating.each(function () {
+        if (parseInt($star_rating.siblings('input.rating-value').val()) >= parseInt($(this).data('rating'))) {
+          return $(this).removeClass('fa-star-o').addClass('fa-star');
+        } else {
+          return $(this).removeClass('fa-star').addClass('fa-star-o');
+        }
+      });
+    };
+
+    $star_rating.on('click', function () {
+      $star_rating.siblings('input.rating-value').val($(this).data('rating'));
+      return SetRatingStar();
+    });
+
+    SetRatingStar();
+    $(document).ready(function () {
+
+    });
+
+  </script>
+  <script type="text/javascript">
+    function validateForm() {
+      var x = document.forms["ratingForm"]["rating"].value;
+      if (x == "0") {
+        alert("Invalid Input");
+        return false;
+      }
+    }
+  </script>
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

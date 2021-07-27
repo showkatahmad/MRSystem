@@ -1,0 +1,31 @@
+{% extends 'base.html'%}
+{% block title %}Recommendations{% endblock %}
+{% block main %}
+<div class="container-fluid text-center">
+    <!-- Movie list -->
+    <div class="row">
+        {% if movie_list %}
+        {% for movie in movie_list %}
+        <div class="col-sm-2 col-md-2 my-1">
+            <div class="thumbnail">
+                <h5 >{{movie.title}}</h5>
+                <a href="{% url 'detail' movie.id %}">
+                    <img src="{{ movie.movie_logo.url}}" class="img ">
+                </a>
+                <h5>{{movie.genre}}</h5>
+                <div class="caption">
+
+                    <!-- View Details -->
+                    <a href="{% url 'detail' movie.id %}" class="btn btn-primary btn-sm" role="button">Give Rating</a>
+
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock main %}

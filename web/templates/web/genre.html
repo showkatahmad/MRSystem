@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home | {{block.super}}{% endblock title %}
+{% block main %}
+<div>
+    <!-- Movie list -->
+    <div class="row col-lg-12 col-sm-12 col-md-12 mx-0 justify-content-center container">
+        {% if genre %}
+        {% for genre in genre %}
+        <div class="card text-center m-1" style="width: 10%;">
+            <img style="height: 256px;" class="card-img-top" src="{{ genre.movie.movie_logo.url}}" alt="{{ movie.poster.url}}">
+            <div class="card-body">
+                <p class='m-0' >{{genre.movie.title}}</p>
+                <a href="{% url 'detail' genre.movie.id %}" class="btn btn-primary btn-sm" role="button">Give Rating</a>
+            </div>
+          </div>        
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock main %}
